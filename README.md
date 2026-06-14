@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="public/og-image.png" alt="Globo Interativo — preview" width="720" />
+  <img src="public/og-image.webp" alt="Globo Interativo — preview" width="720" />
 </p>
 
 <h1 align="center">🌍 Globo Interativo</h1>
@@ -183,7 +183,8 @@ globo-interativo/
 │   ├── app.js
 │   ├── index.html
 │   ├── styles.css
-│   ├── og-image.png    # Preview WhatsApp / redes sociais
+│   ├── og-image.webp   # Preview WhatsApp / redes sociais (66 KB)
+│   ├── og-image.jpg    # Fallback JPEG para crawlers legados
 │   └── data/
 │       └── cable-geo.json
 ├── scripts/
@@ -197,7 +198,7 @@ globo-interativo/
 
 ## 📱 Compartilhamento (WhatsApp, redes sociais)
 
-O projeto inclui **meta tags Open Graph** e uma imagem de preview (`og-image.png`, 1200×630 px) para exibir título, descrição e miniatura ao compartilhar o link:
+O projeto inclui **meta tags Open Graph** e uma imagem de preview (`og-image.webp`, 1200×630 px, ~66 KB) para exibir título, descrição e miniatura ao compartilhar o link:
 
 - **Título:** Globo Interativo — Conheça o Planeta em Tempo Real
 - **Descrição:** Visualização 3D interativa da Terra com camadas geográficas, dados ao vivo e dossiês de países.
