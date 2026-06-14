@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Globo Interativo — Visualização Planetária em Tempo Real</title>
+  <meta name="description" content="Explore a Terra em 3D: fronteiras, fusos horários, trópicos, cabos submarinos, estatísticas ao vivo e dossiês de países. Ferramenta digital gratuita para geografia, cidadania e educação alinhada à BNCC." />
+  <meta name="author" content="Diego Duenhas" />
+  <meta name="theme-color" content="#03060a" />
+  <link rel="canonical" href="https://globo.educar.workers.dev/" />
+
+  <!-- Open Graph / WhatsApp / redes sociais -->
+  <meta property="og:type" content="website" />
+  <meta property="og:url" content="https://globo.educar.workers.dev/" />
+  <meta property="og:site_name" content="Globo Interativo" />
+  <meta property="og:title" content="Globo Interativo — Conheça o Planeta em Tempo Real" />
+  <meta property="og:description" content="Visualização 3D interativa da Terra com camadas geográficas, dados ao vivo e dossiês de países. Ideal para sala de aula, autodidatismo e formação cidadã." />
+  <meta property="og:image" content="https://globo.educar.workers.dev/og-image.png" />
+  <meta property="og:image:width" content="1200" />
+  <meta property="og:image:height" content="630" />
+  <meta property="og:image:alt" content="Globo terrestre interativo em visualização 3D com interface high-tech" />
+  <meta property="og:locale" content="pt_BR" />
+
+  <!-- Twitter / X -->
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content="Globo Interativo — Conheça o Planeta em Tempo Real" />
+  <meta name="twitter:description" content="Visualização 3D interativa da Terra com camadas geográficas, dados ao vivo e dossiês de países." />
+  <meta name="twitter:image" content="https://globo.educar.workers.dev/og-image.png" />
+
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Orbitron:wght@500;700;900&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <!-- Tela / bezel do monitor -->
+  <div class="monitor">
+    <div class="bezel-label bezel-label--top">GLOBO INTERATIVO · GEO-VISUALIZAÇÃO PLANETÁRIA · MODEL GX-9</div>
+    <div class="bezel-label bezel-label--bottom">PWR ▮▮▮▮▮▮▮▯▯  ·  SIGNAL 98.4%  ·  ENC AES-256</div>
+
+    <footer class="site-footer">
+      Desenvolvido por <a href="https://diegoduenhas.com.br" target="_blank" rel="noopener noreferrer">Diego Duenhas</a>
+      · Licença <a href="https://github.com/dduenhas/globo-interativo/blob/main/LICENSE" target="_blank" rel="noopener noreferrer">MIT</a>
+      · <a href="https://github.com/dduenhas/globo-interativo" target="_blank" rel="noopener noreferrer">Código no GitHub</a>
+    </footer>
+
+    <div class="screen" id="screen">
+      <!-- Render do globo -->
+      <div id="globeViz"></div>
+
+      <!-- Camadas de efeito -->
+      <div class="fx fx-grid"></div>
+      <div class="fx fx-scanlines"></div>
+      <div class="fx fx-vignette"></div>
+      <div class="fx fx-flicker"></div>
+      <div class="fx fx-noise"></div>
+
+      <!-- HUD -->
+      <div class="hud">
+        <!-- Cantos -->
+        <span class="corner corner--tl"></span>
+        <span class="corner corner--tr"></span>
+        <span class="corner corner--bl"></span>
+        <span class="corner corner--br"></span>
+
+        <!-- Barra superior -->
+        <header class="topbar">
+          <div class="topbar__left">
+            <span class="logo">◢◤ GLOBO INTERATIVO</span>
+            <span class="divider">/</span>
+            <span class="subtitle">VISUALIZAÇÃO PLANETÁRIA EM TEMPO REAL</span>
+          </div>
+          <div class="topbar__right">
+            <span class="stat"><i class="dot dot--ok"></i> LINK ESTÁVEL</span>
+            <span class="stat" id="utcClock">--:--:-- UTC</span>
+            <span class="stat"><i class="dot dot--warn"></i> TRK <span id="trackCount">000</span></span>
+          </div>
+        </header>
+
+        <!-- Busca de países -->
+        <search class="search-dock" id="globeSearchWrap" role="search" autocomplete="off">
+          <div class="search-dock__box">
+            <input
+              type="search"
+              id="globeSearchInput"
+              name="globe-q"
+              class="search-dock__input"
+              placeholder="Buscar país…"
+              autocomplete="off"
+              autocorrect="off"
+              autocapitalize="off"
+              spellcheck="false"
+              enterkeyhint="search"
+              role="searchbox"
+              aria-label="Buscar país no globo"
+              data-1p-ignore
+              data-lpignore="true"
+              data-bwignore
+              data-form-type="other"
+              data-protonpass-ignore
+              readonly
+            />
+            <span class="search-dock__icon" aria-hidden="true">⌕</span>
+          </div>
+          <div class="search-dock__drop" id="globeSearchDrop" hidden>
+            <div class="search-dock__list" id="globeSearchList"></div>
+          </div>
+        </search>
+
+        <!-- Painel esquerdo: stream de código / logs -->
+        <aside class="panel panel--left">
+          <div class="panel__head">
+            <span>SYS://telemetry.log</span>
+            <span class="blink">▍</span>
+          </div>
+          <div class="panel__body code-stream" id="codeStream"></div>
+        </aside>
+
+        <!-- Painel direito: dados em tempo real / país -->
+        <aside class="panel panel--right">
+          <div class="panel__head">
+            <span id="infoTitle">PLANETA TERRA // TEMPO REAL</span>
+            <span class="blink">●</span>
+          </div>
+          <div class="panel__body info" id="infoBody"></div>
+        </aside>
+
+        <!-- Mira central -->
+        <div class="crosshair">
+          <span class="crosshair__ring"></span>
+          <span class="crosshair__tick crosshair__tick--n"></span>
+          <span class="crosshair__tick crosshair__tick--s"></span>
+          <span class="crosshair__tick crosshair__tick--e"></span>
+          <span class="crosshair__tick crosshair__tick--w"></span>
+        </div>
+
+        <!-- Barra inferior -->
+        <footer class="bottombar">
+          <div class="readbar" id="coordReadout">LAT +00.000  LON +000.000</div>
+          <div class="toggles" id="toggles">
+            <button class="tgl tgl--master" data-f="master"><i></i>⏻ SISTEMAS</button>
+            <button class="tgl" data-f="night"><i></i>☾ NOITE</button>
+            <button class="tgl" data-f="daynight"><i></i>◐ DIA/NOITE</button>
+            <button class="tgl active" data-f="rotate"><i></i>⟳ ROTAÇÃO</button>
+            <button class="tgl" data-f="borders"><i></i>▢ FRONTEIRAS</button>
+            <button class="tgl" data-f="labels"><i></i>⬡ NOMES</button>
+            <button class="tgl" data-f="sats"><i></i>✦ SATÉLITES</button>
+            <button class="tgl" data-f="arcs"><i></i>⤳ ARCOS</button>
+            <button class="tgl" data-f="cables"><i></i>≋ CABOS</button>
+            <button class="tgl" data-f="tz"><i></i>⌚ FUSOS</button>
+            <button class="tgl" data-f="tropics"><i></i>≡ TRÓPICOS</button>
+            <button class="tgl tgl--action" data-f="reset"><i></i>⊙ RECENTRAR</button>
+          </div>
+          <div class="readbar">ALT <span id="altReadout">12 450 km</span> · ZOOM <span id="zoomReadout">1.0x</span></div>
+        </footer>
+
+        <!-- Tooltip flutuante das camadas -->
+        <div class="layer-tip" id="layerTip" aria-hidden="true"></div>
+      </div>
+
+      <!-- Tela de boot -->
+      <div class="boot" id="boot">
+        <pre id="bootText"></pre>
+      </div>
+    </div>
+  </div>
+
+  <script type="importmap">
+    {
+      "imports": {
+        "solar-calculator": "https://esm.sh/solar-calculator@0.3.0"
+      }
+    }
+  </script>
+  <!-- Three.js global ANTES do globe.gl (mesma instância para shader dia/noite) -->
+  <script src="https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.min.js"></script>
+  <script src="https://unpkg.com/globe.gl@2.34.4/dist/globe.gl.min.js"></script>
+  <script type="module" src="app.js?v=grid-v7"></script>
+</body>
+</html>

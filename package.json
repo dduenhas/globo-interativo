@@ -1,0 +1,20 @@
+{
+  "name": "globo-interativo",
+  "version": "1.0.0",
+  "description": "Globo terrestre 3D interativo para educação em geografia e cidadania",
+  "private": true,
+  "scripts": {
+    "deploy": "wrangler deploy",
+    "og-image": "python scripts/generate-og-image.py"
+  },
+  "devDependencies": {
+    "wrangler": "^4.100.0"
+  },
+  "license": "MIT",
+  "author": "Diego Duenhas (https://diegoduenhas.com.br)",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/dduenhas/globo-interativo.git"
+  },
+  "homepage": "https://globo.educar.workers.dev"
+}
