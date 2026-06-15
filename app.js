@@ -536,12 +536,23 @@ function activePaths() {
 }
 
 function activeLabels() {
-  return state.labels ? LABELS : [];
+  const out = [];
+  if (state.labels) out.push(...LABELS);
+  if (state.oceans) out.push(...OCEAN_LABELS);
+  return out;
 }
 
 function polygonStrokeColorFn() {
   return state.borders ? "#46e6ff" : "rgba(0,0,0,0)";
 }
+
+const OCEAN_LABELS = [
+  { lat: 0, lng: -145, text: "OCEANO PACÍFICO", kind: "ocean" },
+  { lat: 8, lng: -42, text: "OCEANO ATLÂNTICO", kind: "ocean" },
+  { lat: -22, lng: 82, text: "OCEANO ÍNDICO", kind: "ocean" },
+  { lat: 72, lng: -30, text: "OCEANO ÁRTICO", kind: "ocean" },
+  { lat: -62, lng: 0, text: "OCEANO ANTÁRTICO", kind: "ocean" },
+];
 
 /* =========================================================
    SHADER DIA/NOITE (oficial globe.gl + solar-calculator)
@@ -624,7 +635,7 @@ function updateDayNightUniforms(dt = Date.now()) {
 const state = {
   telemetry: true,
   night: false, daynight: false, rotate: true, borders: false,
-  labels: false, sats: false, arcs: false, cables: false, tz: false, tropics: false,
+  labels: false, oceans: false, sats: false, arcs: false, cables: false, tz: false, tropics: false,
 };
 let FEATURES = [], LABELS = [], ARCS = [], CABLES = [], SATS = [];
 let hoverD = null, selectedD = null;
@@ -660,8 +671,9 @@ const world = Globe()(el("globeViz"))
   .objectLat((d) => d.lat).objectLng((d) => d.lng).objectAltitude((d) => d.alt)
   .objectThreeObject((d) => makeSatObject(d.color))
   .labelLat((d) => d.lat).labelLng((d) => d.lng).labelText((d) => d.text)
-  .labelSize(0.42).labelDotRadius(0.18)
-  .labelColor(() => "rgba(154,243,255,0.85)")
+  .labelSize((d) => (d.kind === "ocean" ? 0.38 : 0.42))
+  .labelDotRadius((d) => (d.kind === "ocean" ? 0 : 0.18))
+  .labelColor((d) => (d.kind === "ocean" ? "rgba(70,230,255,0.72)" : "rgba(154,243,255,0.85)"))
   .labelResolution(2).labelAltitude(0.012).labelsTransitionDuration(0)
   .onGlobeReady(() => {
     tzMeridiansGroup = buildTzMeridiansGroup();
@@ -1071,7 +1083,7 @@ function refreshLabels() {
     lng: f.properties.__c.lng,
     text: ptName(f.properties).toUpperCase(),
   }));
-  if (state.labels) world.labelsData(activeLabels());
+  if (state.labels || state.oceans) world.labelsData(activeLabels());
 }
 function flagHTML(iso2, label) {
   if (isoOk(iso2)) {
@@ -1320,6 +1332,7 @@ function applyAll() {
 function applyFeature(name) {
   switch (name) {
     case "labels":
+    case "oceans":
       world.labelsData(activeLabels());
       break;
     case "tz":
@@ -1362,7 +1375,7 @@ function setDayNight(on) {
   refreshPolys();
 }
 
-const OVERLAYS = ["borders", "labels", "sats", "arcs", "cables", "tz", "tropics"];
+const OVERLAYS = ["borders", "labels", "oceans", "sats", "arcs", "cables", "tz", "tropics"];
 function setToggleUI(name, on) {
   const btn = document.querySelector(`.tgl[data-f="${name}"]`);
   if (btn) btn.classList.toggle("active", on);
@@ -1415,6 +1428,7 @@ const svg = {
   reset: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 240 86"><rect width="240" height="86" fill="#071a22"/><circle cx="120" cy="43" r="22" fill="none" stroke="#ffb454" stroke-width="1.5"/><circle cx="120" cy="43" r="4" fill="#ffb454"/></svg>`,
   tz: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 240 86"><rect width="240" height="86" fill="#071a22"/><ellipse cx="120" cy="43" rx="38" ry="26" fill="none" stroke="#46e6ff" stroke-width="1.2"/><line x1="82" y1="43" x2="158" y2="43" stroke="#ffb454" stroke-width="1.5"/><line x1="98" y1="20" x2="98" y2="66" stroke="#ffb454" stroke-width="1.2" opacity=".7"/><line x1="120" y1="20" x2="120" y2="66" stroke="#ffb454" stroke-width="1.2" opacity=".7"/><line x1="142" y1="20" x2="142" y2="66" stroke="#ffb454" stroke-width="1.2" opacity=".7"/><text x="120" y="48" fill="#ffb454" font-family="monospace" font-size="11" text-anchor="middle">UTC</text></svg>`,
   tropics: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 240 86"><rect width="240" height="86" fill="#071a22"/><ellipse cx="120" cy="43" rx="38" ry="26" fill="none" stroke="#46e6ff" stroke-width="1.2"/><line x1="82" y1="43" x2="158" y2="43" stroke="#46e6ff" stroke-width="2"/><line x1="82" y1="30" x2="158" y2="30" stroke="#46e6ff" stroke-width="1.2" opacity=".75"/><line x1="82" y1="56" x2="158" y2="56" stroke="#46e6ff" stroke-width="1.2" opacity=".75"/></svg>`,
+  oceans: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 240 86"><rect width="240" height="86" fill="#071a22"/><ellipse cx="120" cy="43" rx="38" ry="26" fill="rgba(70,230,255,.08)" stroke="#46e6ff" stroke-width="1.2"/><path d="M82 50 Q100 38 118 50 T154 50" fill="none" stroke="#46e6ff" stroke-width="1.4" opacity=".85"/><path d="M86 58 Q104 46 122 58 T158 58" fill="none" stroke="#46e6ff" stroke-width="1.2" opacity=".55"/><text x="120" y="36" fill="#9af3ff" font-family="monospace" font-size="10" text-anchor="middle">PACÍFICO</text></svg>`,
 };
 const artImg = (s) => `<img style="width:100%;height:100%;object-fit:cover" alt="" src="${s}" onerror="this.style.display='none'"/>`;
 const artSvg = (k) => `<img style="width:100%;height:100%;object-fit:cover" alt="" src="data:image/svg+xml;charset=utf-8,${encodeURIComponent(svg[k])}"/>`;
@@ -1441,6 +1455,9 @@ const LAYER_INFO = {
   labels: { t: "NOMES DOS PAÍSES", art: artSvg("labels"),
     d: "Rótulos com o nome de cada nação posicionados no seu centro geográfico.",
     f: [["Nações soberanas", "195"], ["Idiomas escritos", "cerca de 4.000"], ["Capital mais populosa", "Tóquio"], ["Zonas horárias", "24 principais"]] },
+  oceans: { t: "NOMES DOS OCEANOS", art: artSvg("oceans"),
+    d: "Rótulos dos cinco oceanos em português, posicionados sobre as grandes bacias marítimas.",
+    f: [["Oceanos", "Pacífico, Atlântico, Índico, Ártico, Antártico"], ["Idioma", "português (PT-BR)"], ["Independente", "camada separada dos nomes de países"]] },
   night: { t: "MODO NOITE", art: artSvg("night"),
     d: "Textura noturna da Terra mostrando as luzes urbanas vistas do espaço.",
     f: [["Fonte", "NASA Black Marble"], ["Poluição luminosa", "cresce 2%/ano"], ["Quase apagada", "Coreia do Norte"]] },
@@ -1452,7 +1469,7 @@ const LAYER_INFO = {
     f: [["Rotação real (equador)", "1.674 km/h"], ["Dia sideral", "23h 56min 4s"]] },
   master: { t: "SISTEMAS", art: artSvg("master"),
     d: "Liga ou desliga todas as camadas de uma só vez.",
-    f: [["Controla", "fronteiras, nomes, satélites, arcos, cabos, fusos, trópicos"]] },
+    f: [["Controla", "fronteiras, nomes, oceanos, satélites, arcos, cabos, fusos, trópicos"]] },
   telemetry: { t: "TELEMETRIA", art: artSvg("telemetry"),
     d: "Exibe ou oculta o painel SYS://telemetry.log com logs simulados de satélites, rede e sensores.",
     f: [["Painel", "SYS://telemetry.log"], ["Conteúdo", "logs orbitais e de rede"], ["Desligado", "painel oculto e stream pausado"]] },
