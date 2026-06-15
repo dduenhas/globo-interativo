@@ -2,7 +2,7 @@
 <html lang="pt-BR">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
   <title>Globo Interativo — Visualização Planetária em Tempo Real</title>
   <meta name="description" content="Explore a Terra em 3D: fronteiras, fusos horários, trópicos, cabos submarinos, estatísticas ao vivo e dossiês de países. Ferramenta digital gratuita para geografia, cidadania e educação alinhada à BNCC." />
   <meta name="author" content="Diego Duenhas" />
@@ -141,34 +141,25 @@
         <!-- Barra inferior -->
         <footer class="bottombar">
           <div class="readbar readbar--coords" id="coordReadout">LAT +00.000  LON +000.000</div>
-          <div class="toggles-wrap">
-            <button type="button" class="sys-drawer-fab" id="sysDrawerFab" aria-expanded="false" aria-controls="sysDrawerPanel" aria-label="Abrir menu de camadas e sistemas">⏻ CAMADAS</button>
-            <div class="sys-drawer" id="sysDrawer" aria-hidden="true">
-              <div class="sys-drawer__backdrop" id="sysDrawerBackdrop"></div>
-              <div class="sys-drawer__panel" id="sysDrawerPanel">
-                <div class="sys-drawer__head">
-                  <span>CAMADAS &amp; SISTEMAS</span>
-                  <button type="button" class="sys-drawer__close" id="sysDrawerClose" aria-label="Fechar menu">✕</button>
-                </div>
-                <div class="toggles" id="toggles">
-                  <button class="tgl tgl--master" data-f="master"><i></i>⏻ SISTEMAS</button>
-                  <button class="tgl active" data-f="telemetry"><i></i>▤ TELEMETRIA</button>
-                  <button class="tgl" data-f="night"><i></i>☾ NOITE</button>
-                  <button class="tgl" data-f="daynight"><i></i>◐ DIA/NOITE</button>
-                  <button class="tgl active" data-f="rotate"><i></i>⟳ ROTAÇÃO</button>
-                  <button class="tgl" data-f="borders"><i></i>▢ FRONTEIRAS</button>
-                  <button class="tgl" data-f="labels"><i></i>⬡ NOMES</button>
-                  <button class="tgl" data-f="sats"><i></i>✦ SATÉLITES</button>
-                  <button class="tgl" data-f="arcs"><i></i>⤳ ARCOS</button>
-                  <button class="tgl" data-f="cables"><i></i>≋ CABOS</button>
-                  <button class="tgl" data-f="tz"><i></i>⌚ FUSOS</button>
-                  <button class="tgl" data-f="tropics"><i></i>≡ TRÓPICOS</button>
-                  <button class="tgl tgl--action" data-f="reset"><i></i>⊙ RECENTRAR</button>
-                </div>
-              </div>
+          <div class="toggles-wrap" id="togglesDesktopMount">
+            <div class="toggles" id="toggles">
+              <button class="tgl tgl--master" data-f="master"><i></i>⏻ SISTEMAS</button>
+              <button class="tgl active" data-f="telemetry"><i></i>▤ TELEMETRIA</button>
+              <button class="tgl" data-f="night"><i></i>☾ NOITE</button>
+              <button class="tgl" data-f="daynight"><i></i>◐ DIA/NOITE</button>
+              <button class="tgl active" data-f="rotate"><i></i>⟳ ROTAÇÃO</button>
+              <button class="tgl" data-f="borders"><i></i>▢ FRONTEIRAS</button>
+              <button class="tgl" data-f="labels"><i></i>⬡ NOMES</button>
+              <button class="tgl" data-f="sats"><i></i>✦ SATÉLITES</button>
+              <button class="tgl" data-f="arcs"><i></i>⤳ ARCOS</button>
+              <button class="tgl" data-f="cables"><i></i>≋ CABOS</button>
+              <button class="tgl" data-f="tz"><i></i>⌚ FUSOS</button>
+              <button class="tgl" data-f="tropics"><i></i>≡ TRÓPICOS</button>
+              <button class="tgl tgl--action" data-f="reset"><i></i>⊙ RECENTRAR</button>
             </div>
           </div>
           <div class="readbar readbar--meta">ALT <span id="altReadout">12 450 km</span> · ZOOM <span id="zoomReadout">1.0x</span></div>
+          <button type="button" class="sys-drawer-fab" id="sysDrawerFab" aria-expanded="false" aria-controls="sysDrawerPanel" aria-label="Abrir menu de camadas e sistemas">⏻ CAMADAS</button>
         </footer>
 
         <!-- Tooltip flutuante das camadas -->
@@ -178,6 +169,18 @@
       <!-- Tela de boot -->
       <div class="boot" id="boot">
         <pre id="bootText"></pre>
+      </div>
+    </div>
+
+    <!-- Drawer mobile (fora de .screen para não ser cortado por overflow) -->
+    <div class="sys-drawer" id="sysDrawer" aria-hidden="true">
+      <div class="sys-drawer__backdrop" id="sysDrawerBackdrop"></div>
+      <div class="sys-drawer__panel" id="sysDrawerPanel">
+        <div class="sys-drawer__head">
+          <span>CAMADAS &amp; SISTEMAS</span>
+          <button type="button" class="sys-drawer__close" id="sysDrawerClose" aria-label="Fechar menu">✕</button>
+        </div>
+        <div class="sys-drawer__body" id="togglesMobileMount"></div>
       </div>
     </div>
   </div>
@@ -192,6 +195,6 @@
   <!-- Three.js global ANTES do globe.gl (mesma instância para shader dia/noite) -->
   <script src="https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.min.js"></script>
   <script src="https://unpkg.com/globe.gl@2.34.4/dist/globe.gl.min.js"></script>
-  <script type="module" src="app.js?v=mobile-v1"></script>
+  <script type="module" src="app.js?v=mobile-v2"></script>
 </body>
 </html>

@@ -1509,9 +1509,11 @@ el("toggles").addEventListener("mouseout", (e) => {
   const c = world.controls();
   c.autoRotate = true; c.autoRotateSpeed = 0.45;
   c.enableZoom = true; c.enablePan = false;
+  c.enableRotate = true;
   c.minDistance = 130; c.maxDistance = 600;
   c.zoomSpeed = 0.8; c.rotateSpeed = 0.6;
   c.dampingFactor = 0.12; c.enableDamping = true;
+  c.touches = { ONE: THREE.TOUCH.ROTATE, TWO: THREE.TOUCH.DOLLY };
   c.addEventListener("change", syncDayNightRotation);
 })();
 
@@ -1582,6 +1584,7 @@ function closeSysDrawer() {
 }
 function applyMobileLayout() {
   document.documentElement.classList.toggle("is-mobile", isMobileLayout());
+  mountTogglesForLayout();
   if (isMobileLayout()) {
     closeSysDrawer();
   } else {
@@ -1592,14 +1595,35 @@ function applyMobileLayout() {
   syncInfoPanelToggle();
   resize();
 }
+function mountTogglesForLayout() {
+  const toggles = el("toggles");
+  const desktop = el("togglesDesktopMount");
+  const mobile = el("togglesMobileMount");
+  if (!toggles || !desktop || !mobile) return;
+  (isMobileLayout() ? mobile : desktop).appendChild(toggles);
+}
+function setupGlobeTouch() {
+  const container = el("globeViz");
+  if (!container) return;
+  const blockPinch = (e) => {
+    if (e.touches.length > 1) e.preventDefault();
+  };
+  container.addEventListener("touchstart", blockPinch, { passive: false });
+  container.addEventListener("touchmove", blockPinch, { passive: false });
+}
+function toggleSysDrawer() {
+  if (el("sysDrawer")?.classList.contains("sys-drawer--open")) closeSysDrawer();
+  else openSysDrawer();
+}
 el("infoPanelToggle")?.addEventListener("click", () => {
   el("infoPanel").classList.toggle("panel--collapsed");
   syncInfoPanelToggle();
   resize();
 });
-el("sysDrawerFab")?.addEventListener("click", () => {
-  if (el("sysDrawer")?.classList.contains("sys-drawer--open")) closeSysDrawer();
-  else openSysDrawer();
+el("sysDrawerFab")?.addEventListener("click", (e) => {
+  e.preventDefault();
+  e.stopPropagation();
+  toggleSysDrawer();
 });
 el("sysDrawerClose")?.addEventListener("click", closeSysDrawer);
 el("sysDrawerBackdrop")?.addEventListener("click", closeSysDrawer);
@@ -1607,6 +1631,7 @@ document.addEventListener("keydown", (e) => {
   if (e.key === "Escape") closeSysDrawer();
 });
 MQ_MOBILE.addEventListener("change", applyMobileLayout);
+setupGlobeTouch();
 
 window.addEventListener("resize", resize);
 applyMobileLayout();
