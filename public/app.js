@@ -87,9 +87,22 @@ function pushLog(html) {
   while (stream.children.length > 60) stream.removeChild(stream.firstChild);
   stream.scrollTop = stream.scrollHeight;
 }
-setInterval(() => {
+let telemetryTimer = null;
+function tickTelemetry() {
   pushLog(logTemplates[Math.floor(Math.random() * logTemplates.length)]());
-}, 460);
+}
+function setTelemetry(on) {
+  state.telemetry = on;
+  const panel = el("telemetryPanel");
+  if (panel) panel.hidden = !on;
+  setToggleUI("telemetry", on);
+  if (on) {
+    if (!telemetryTimer) telemetryTimer = setInterval(tickTelemetry, 460);
+  } else if (telemetryTimer) {
+    clearInterval(telemetryTimer);
+    telemetryTimer = null;
+  }
+}
 
 /* =========================================================
    GEO HELPERS
@@ -605,6 +618,7 @@ function updateDayNightUniforms(dt = Date.now()) {
    GLOBO
    ========================================================= */
 const state = {
+  telemetry: true,
   night: false, daynight: false, rotate: true, borders: false,
   labels: false, sats: false, arcs: false, cables: false, tz: false, tropics: false,
 };
@@ -1350,6 +1364,7 @@ function setToggleUI(name, on) {
   if (btn) btn.classList.toggle("active", on);
 }
 function syncAllToggles() {
+  setToggleUI("telemetry", state.telemetry);
   setToggleUI("night", state.night);
   setToggleUI("daynight", state.daynight);
   setToggleUI("rotate", state.rotate);
@@ -1363,6 +1378,7 @@ el("toggles").addEventListener("click", (e) => {
   const f = btn.dataset.f;
 
   if (f === "reset") { deselect(); world.pointOfView({ lat: 20, lng: 0, altitude: 2.5 }, 900); return; }
+  if (f === "telemetry") { setTelemetry(!state.telemetry); return; }
   if (f === "master") {
     const on = !btn.classList.contains("active");
     btn.classList.toggle("active", on);
@@ -1391,6 +1407,7 @@ const svg = {
   daynight: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 240 86"><rect width="240" height="86" fill="#071a22"/><defs><clipPath id="c"><circle cx="120" cy="43" r="28"/></clipPath></defs><g clip-path="url(#c)"><rect x="92" y="15" width="28" height="56" fill="#ffb454" opacity=".85"/><rect x="120" y="15" width="28" height="56" fill="#071a22"/></g><circle cx="120" cy="43" r="28" fill="none" stroke="#46e6ff" stroke-width="1.5"/></svg>`,
   rotate: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 240 86"><rect width="240" height="86" fill="#071a22"/><path d="M150 43 a30 30 0 1 1 -9 -21" fill="none" stroke="#46e6ff" stroke-width="2.5"/><path d="M141 14 l4 12 l-13 1 Z" fill="#46e6ff"/></svg>`,
   master: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 240 86"><rect width="240" height="86" fill="#071a22"/><path d="M120 22 a22 22 0 1 0 14 5" fill="none" stroke="#5dff9b" stroke-width="2.5"/><line x1="120" y1="18" x2="120" y2="44" stroke="#5dff9b" stroke-width="2.5"/></svg>`,
+  telemetry: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 240 86"><rect width="240" height="86" fill="#071a22"/><rect x="52" y="22" width="136" height="42" rx="2" fill="rgba(70,230,255,.08)" stroke="#46e6ff" stroke-width="1.2"/><line x1="62" y1="34" x2="178" y2="34" stroke="#5dff9b" stroke-width="1.2"/><line x1="62" y1="44" x2="150" y2="44" stroke="#46e6ff" stroke-width="1.2" opacity=".7"/><line x1="62" y1="54" x2="168" y2="54" stroke="#ffb454" stroke-width="1.2" opacity=".7"/></svg>`,
   reset: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 240 86"><rect width="240" height="86" fill="#071a22"/><circle cx="120" cy="43" r="22" fill="none" stroke="#ffb454" stroke-width="1.5"/><circle cx="120" cy="43" r="4" fill="#ffb454"/></svg>`,
   tz: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 240 86"><rect width="240" height="86" fill="#071a22"/><ellipse cx="120" cy="43" rx="38" ry="26" fill="none" stroke="#46e6ff" stroke-width="1.2"/><line x1="82" y1="43" x2="158" y2="43" stroke="#ffb454" stroke-width="1.5"/><line x1="98" y1="20" x2="98" y2="66" stroke="#ffb454" stroke-width="1.2" opacity=".7"/><line x1="120" y1="20" x2="120" y2="66" stroke="#ffb454" stroke-width="1.2" opacity=".7"/><line x1="142" y1="20" x2="142" y2="66" stroke="#ffb454" stroke-width="1.2" opacity=".7"/><text x="120" y="48" fill="#ffb454" font-family="monospace" font-size="11" text-anchor="middle">UTC</text></svg>`,
   tropics: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 240 86"><rect width="240" height="86" fill="#071a22"/><ellipse cx="120" cy="43" rx="38" ry="26" fill="none" stroke="#46e6ff" stroke-width="1.2"/><line x1="82" y1="43" x2="158" y2="43" stroke="#46e6ff" stroke-width="2"/><line x1="82" y1="30" x2="158" y2="30" stroke="#46e6ff" stroke-width="1.2" opacity=".75"/><line x1="82" y1="56" x2="158" y2="56" stroke="#46e6ff" stroke-width="1.2" opacity=".75"/></svg>`,
@@ -1432,6 +1449,9 @@ const LAYER_INFO = {
   master: { t: "SISTEMAS", art: artSvg("master"),
     d: "Liga ou desliga todas as camadas de uma só vez.",
     f: [["Controla", "fronteiras, nomes, satélites, arcos, cabos, fusos, trópicos"]] },
+  telemetry: { t: "TELEMETRIA", art: artSvg("telemetry"),
+    d: "Exibe ou oculta o painel SYS://telemetry.log com logs simulados de satélites, rede e sensores.",
+    f: [["Painel", "SYS://telemetry.log"], ["Conteúdo", "logs orbitais e de rede"], ["Desligado", "painel oculto e stream pausado"]] },
   reset: { t: "RECENTRAR", art: artSvg("reset"),
     d: "Recentraliza a câmera e limpa a seleção atual.",
     f: [["Ação", "volta à visão inicial"]] },
@@ -1526,3 +1546,4 @@ function resize() {
 window.addEventListener("resize", resize);
 resize();
 world.pointOfView({ lat: 20, lng: 0, altitude: 2.5 });
+setTelemetry(state.telemetry);

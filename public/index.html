@@ -109,7 +109,7 @@
         </search>
 
         <!-- Painel esquerdo: stream de código / logs -->
-        <aside class="panel panel--left">
+        <aside class="panel panel--left" id="telemetryPanel">
           <div class="panel__head">
             <span>SYS://telemetry.log</span>
             <span class="blink">▍</span>
@@ -140,6 +140,7 @@
           <div class="readbar" id="coordReadout">LAT +00.000  LON +000.000</div>
           <div class="toggles" id="toggles">
             <button class="tgl tgl--master" data-f="master"><i></i>⏻ SISTEMAS</button>
+            <button class="tgl active" data-f="telemetry"><i></i>▤ TELEMETRIA</button>
             <button class="tgl" data-f="night"><i></i>☾ NOITE</button>
             <button class="tgl" data-f="daynight"><i></i>◐ DIA/NOITE</button>
             <button class="tgl active" data-f="rotate"><i></i>⟳ ROTAÇÃO</button>
@@ -176,6 +177,6 @@
   <!-- Three.js global ANTES do globe.gl (mesma instância para shader dia/noite) -->
   <script src="https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.min.js"></script>
   <script src="https://unpkg.com/globe.gl@2.34.4/dist/globe.gl.min.js"></script>
-  <script type="module" src="app.js?v=grid-v7"></script>
+  <script type="module" src="app.js?v=telemetry-v1"></script>
 </body>
 </html>
