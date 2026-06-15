@@ -93,6 +93,10 @@ function tickTelemetry() {
 }
 function setTelemetry(on) {
   state.telemetry = on;
+  syncTelemetryUI();
+}
+function syncTelemetryUI() {
+  const on = state.telemetry && !isMobileLayout();
   const panel = el("telemetryPanel");
   if (panel) panel.hidden = !on;
   setToggleUI("telemetry", on);
@@ -1541,9 +1545,71 @@ const t0 = performance.now();
 
 function resize() {
   const s = el("globeViz");
+  if (!s) return;
   world.width(s.clientWidth).height(s.clientHeight);
 }
+
+/* ===== Mobile layout ===== */
+const MQ_MOBILE = window.matchMedia("(max-width: 760px)");
+function isMobileLayout() {
+  return MQ_MOBILE.matches;
+}
+function syncInfoPanelToggle() {
+  const panel = el("infoPanel");
+  const btn = el("infoPanelToggle");
+  if (!panel || !btn) return;
+  const open = !panel.classList.contains("panel--collapsed");
+  btn.setAttribute("aria-expanded", open ? "true" : "false");
+  btn.textContent = open ? "▾" : "▴";
+  el("screen").classList.toggle("info-collapsed", isMobileLayout() && !open);
+}
+function openSysDrawer() {
+  const drawer = el("sysDrawer");
+  const fab = el("sysDrawerFab");
+  if (!drawer) return;
+  drawer.classList.add("sys-drawer--open");
+  drawer.setAttribute("aria-hidden", "false");
+  fab?.setAttribute("aria-expanded", "true");
+  hideTip();
+}
+function closeSysDrawer() {
+  const drawer = el("sysDrawer");
+  const fab = el("sysDrawerFab");
+  if (!drawer) return;
+  drawer.classList.remove("sys-drawer--open");
+  drawer.setAttribute("aria-hidden", "true");
+  fab?.setAttribute("aria-expanded", "false");
+}
+function applyMobileLayout() {
+  document.documentElement.classList.toggle("is-mobile", isMobileLayout());
+  if (isMobileLayout()) {
+    closeSysDrawer();
+  } else {
+    el("infoPanel")?.classList.remove("panel--collapsed");
+    closeSysDrawer();
+  }
+  syncTelemetryUI();
+  syncInfoPanelToggle();
+  resize();
+}
+el("infoPanelToggle")?.addEventListener("click", () => {
+  el("infoPanel").classList.toggle("panel--collapsed");
+  syncInfoPanelToggle();
+  resize();
+});
+el("sysDrawerFab")?.addEventListener("click", () => {
+  if (el("sysDrawer")?.classList.contains("sys-drawer--open")) closeSysDrawer();
+  else openSysDrawer();
+});
+el("sysDrawerClose")?.addEventListener("click", closeSysDrawer);
+el("sysDrawerBackdrop")?.addEventListener("click", closeSysDrawer);
+document.addEventListener("keydown", (e) => {
+  if (e.key === "Escape") closeSysDrawer();
+});
+MQ_MOBILE.addEventListener("change", applyMobileLayout);
+
 window.addEventListener("resize", resize);
+applyMobileLayout();
 resize();
 world.pointOfView({ lat: 20, lng: 0, altitude: 2.5 });
-setTelemetry(state.telemetry);
+syncTelemetryUI();

@@ -118,10 +118,13 @@
         </aside>
 
         <!-- Painel direito: dados em tempo real / país -->
-        <aside class="panel panel--right">
+        <aside class="panel panel--right" id="infoPanel">
           <div class="panel__head">
             <span id="infoTitle">PLANETA TERRA // TEMPO REAL</span>
-            <span class="blink">●</span>
+            <div class="panel__head-actions">
+              <button type="button" class="panel__toggle" id="infoPanelToggle" aria-expanded="true" aria-controls="infoBody" aria-label="Recolher painel de informações">▾</button>
+              <span class="blink panel__live">●</span>
+            </div>
           </div>
           <div class="panel__body info" id="infoBody"></div>
         </aside>
@@ -137,23 +140,35 @@
 
         <!-- Barra inferior -->
         <footer class="bottombar">
-          <div class="readbar" id="coordReadout">LAT +00.000  LON +000.000</div>
-          <div class="toggles" id="toggles">
-            <button class="tgl tgl--master" data-f="master"><i></i>⏻ SISTEMAS</button>
-            <button class="tgl active" data-f="telemetry"><i></i>▤ TELEMETRIA</button>
-            <button class="tgl" data-f="night"><i></i>☾ NOITE</button>
-            <button class="tgl" data-f="daynight"><i></i>◐ DIA/NOITE</button>
-            <button class="tgl active" data-f="rotate"><i></i>⟳ ROTAÇÃO</button>
-            <button class="tgl" data-f="borders"><i></i>▢ FRONTEIRAS</button>
-            <button class="tgl" data-f="labels"><i></i>⬡ NOMES</button>
-            <button class="tgl" data-f="sats"><i></i>✦ SATÉLITES</button>
-            <button class="tgl" data-f="arcs"><i></i>⤳ ARCOS</button>
-            <button class="tgl" data-f="cables"><i></i>≋ CABOS</button>
-            <button class="tgl" data-f="tz"><i></i>⌚ FUSOS</button>
-            <button class="tgl" data-f="tropics"><i></i>≡ TRÓPICOS</button>
-            <button class="tgl tgl--action" data-f="reset"><i></i>⊙ RECENTRAR</button>
+          <div class="readbar readbar--coords" id="coordReadout">LAT +00.000  LON +000.000</div>
+          <div class="toggles-wrap">
+            <button type="button" class="sys-drawer-fab" id="sysDrawerFab" aria-expanded="false" aria-controls="sysDrawerPanel" aria-label="Abrir menu de camadas e sistemas">⏻ CAMADAS</button>
+            <div class="sys-drawer" id="sysDrawer" aria-hidden="true">
+              <div class="sys-drawer__backdrop" id="sysDrawerBackdrop"></div>
+              <div class="sys-drawer__panel" id="sysDrawerPanel">
+                <div class="sys-drawer__head">
+                  <span>CAMADAS &amp; SISTEMAS</span>
+                  <button type="button" class="sys-drawer__close" id="sysDrawerClose" aria-label="Fechar menu">✕</button>
+                </div>
+                <div class="toggles" id="toggles">
+                  <button class="tgl tgl--master" data-f="master"><i></i>⏻ SISTEMAS</button>
+                  <button class="tgl active" data-f="telemetry"><i></i>▤ TELEMETRIA</button>
+                  <button class="tgl" data-f="night"><i></i>☾ NOITE</button>
+                  <button class="tgl" data-f="daynight"><i></i>◐ DIA/NOITE</button>
+                  <button class="tgl active" data-f="rotate"><i></i>⟳ ROTAÇÃO</button>
+                  <button class="tgl" data-f="borders"><i></i>▢ FRONTEIRAS</button>
+                  <button class="tgl" data-f="labels"><i></i>⬡ NOMES</button>
+                  <button class="tgl" data-f="sats"><i></i>✦ SATÉLITES</button>
+                  <button class="tgl" data-f="arcs"><i></i>⤳ ARCOS</button>
+                  <button class="tgl" data-f="cables"><i></i>≋ CABOS</button>
+                  <button class="tgl" data-f="tz"><i></i>⌚ FUSOS</button>
+                  <button class="tgl" data-f="tropics"><i></i>≡ TRÓPICOS</button>
+                  <button class="tgl tgl--action" data-f="reset"><i></i>⊙ RECENTRAR</button>
+                </div>
+              </div>
+            </div>
           </div>
-          <div class="readbar">ALT <span id="altReadout">12 450 km</span> · ZOOM <span id="zoomReadout">1.0x</span></div>
+          <div class="readbar readbar--meta">ALT <span id="altReadout">12 450 km</span> · ZOOM <span id="zoomReadout">1.0x</span></div>
         </footer>
 
         <!-- Tooltip flutuante das camadas -->
@@ -177,6 +192,6 @@
   <!-- Three.js global ANTES do globe.gl (mesma instância para shader dia/noite) -->
   <script src="https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.min.js"></script>
   <script src="https://unpkg.com/globe.gl@2.34.4/dist/globe.gl.min.js"></script>
-  <script type="module" src="app.js?v=telemetry-v1"></script>
+  <script type="module" src="app.js?v=mobile-v1"></script>
 </body>
 </html>
