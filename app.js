@@ -1602,14 +1602,30 @@ function mountTogglesForLayout() {
   if (!toggles || !desktop || !mobile) return;
   (isMobileLayout() ? mobile : desktop).appendChild(toggles);
 }
+const ZOOM_MIN_ALT = 0.55;
+const ZOOM_MAX_ALT = 4.2;
+const ZOOM_STEP = 1.2;
+
+function nudgeZoom(direction) {
+  const pov = world.pointOfView();
+  const next = direction > 0
+    ? pov.altitude / ZOOM_STEP
+    : pov.altitude * ZOOM_STEP;
+  world.pointOfView(
+    {
+      lat: pov.lat,
+      lng: pov.lng,
+      altitude: THREE.MathUtils.clamp(next, ZOOM_MIN_ALT, ZOOM_MAX_ALT),
+    },
+    260
+  );
+}
+
 function setupGlobeTouch() {
   const container = el("globeViz");
   if (!container) return;
-  const blockPinch = (e) => {
-    if (e.touches.length > 1) e.preventDefault();
-  };
-  container.addEventListener("touchstart", blockPinch, { passive: false });
-  container.addEventListener("touchmove", blockPinch, { passive: false });
+  const canvas = container.querySelector("canvas");
+  if (canvas) canvas.style.touchAction = "none";
 }
 function toggleSysDrawer() {
   if (el("sysDrawer")?.classList.contains("sys-drawer--open")) closeSysDrawer();
@@ -1627,6 +1643,16 @@ el("sysDrawerFab")?.addEventListener("click", (e) => {
 });
 el("sysDrawerClose")?.addEventListener("click", closeSysDrawer);
 el("sysDrawerBackdrop")?.addEventListener("click", closeSysDrawer);
+el("zoomOutBtn")?.addEventListener("click", (e) => {
+  e.preventDefault();
+  e.stopPropagation();
+  nudgeZoom(-1);
+});
+el("zoomInBtn")?.addEventListener("click", (e) => {
+  e.preventDefault();
+  e.stopPropagation();
+  nudgeZoom(1);
+});
 document.addEventListener("keydown", (e) => {
   if (e.key === "Escape") closeSysDrawer();
 });

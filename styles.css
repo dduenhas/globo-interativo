@@ -129,7 +129,8 @@ html, body {
 .hud .btn, .hud .tgl, .hud .toggles, .hud .panel__body, .hud .panel__body a,
 .hud .search-dock, .hud .search-dock *, .hud .panel__toggle,
 .hud .panel__head, .hud .panel__head-actions,
-.hud .sys-drawer-fab, .hud .toggles-wrap, .hud .bottombar { pointer-events: auto; }
+.hud .sys-drawer-fab, .hud .toggles-wrap, .hud .bottombar,
+.hud .zoom-pill, .hud .zoom-pill * { pointer-events: auto; }
 
 /* corners */
 .corner { position: absolute; width: 34px; height: 34px; border: 2px solid var(--cyan); opacity: 0.7; filter: drop-shadow(var(--glow)); }
@@ -399,6 +400,9 @@ html, body {
 .tgl[data-f="night"].active { color: #02151c; background: var(--cyan); border-color: var(--cyan); box-shadow: var(--glow); }
 .tgl[data-f="night"].active i { background: #02151c; box-shadow: none; }
 
+/* zoom pill (mobile) */
+.zoom-pill { display: none; }
+
 .blink { animation: pulse 1s steps(2) infinite; color: var(--cyan); }
 
 /* ===== Info panel (Terra / país) ===== */
@@ -596,6 +600,48 @@ html, body {
   }
   .readbar--coords { flex: 1; }
   .readbar--meta { display: none; }
+
+  .zoom-pill {
+    display: inline-flex;
+    position: fixed;
+    left: 50%;
+    bottom: calc(8px + env(safe-area-inset-bottom, 0px));
+    transform: translateX(-50%);
+    z-index: 16;
+    pointer-events: auto;
+    touch-action: manipulation;
+    border-radius: 999px;
+    border: 1px solid rgba(70,230,255,.32);
+    background: rgba(6, 16, 26, 0.88);
+    box-shadow:
+      0 4px 18px rgba(0,0,0,.45),
+      inset 0 1px 0 rgba(70,230,255,.12);
+    backdrop-filter: blur(12px) saturate(1.15);
+    -webkit-backdrop-filter: blur(12px) saturate(1.15);
+    overflow: hidden;
+  }
+  .zoom-pill__btn {
+    min-width: 52px;
+    padding: 10px 16px;
+    border: 0;
+    background: transparent;
+    color: var(--cyan-soft);
+    font-family: var(--mono);
+    font-size: 15px;
+    letter-spacing: .04em;
+    line-height: 1;
+    cursor: pointer;
+    transition: background .15s, color .15s;
+  }
+  .zoom-pill__btn + .zoom-pill__btn {
+    border-left: 1px solid rgba(70,230,255,.24);
+  }
+  .zoom-pill__btn:active,
+  .zoom-pill__btn:focus-visible {
+    background: rgba(70,230,255,.14);
+    color: #fff;
+    outline: none;
+  }
 
   .sys-drawer-fab {
     display: inline-flex;
