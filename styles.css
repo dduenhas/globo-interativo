@@ -757,7 +757,7 @@ html, body {
        (orientation: landscape) and (max-height: 520px) and (max-width: 960px) {
   .screen {
     --sidebar-w: clamp(250px, 34vw, 330px);
-    --hud-top: 34px;
+    --hud-top: 52px;
   }
   .screen.info-collapsed { --sidebar-w: clamp(250px, 34vw, 330px); }
 
@@ -798,13 +798,23 @@ html, body {
   }
 
   .topbar {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 3px;
     padding: 6px 8px 4px;
     font-size: 9px;
+  }
+  .topbar__left { width: 100%; }
+  .topbar__right {
+    width: 100%;
+    gap: 10px;
+    font-size: 8px;
+    flex-wrap: wrap;
   }
   .logo { font-size: 10px; }
 
   .search-dock {
-    top: 28px;
+    top: 46px;
     left: 8px;
     width: calc(100% - 16px);
   }
@@ -813,7 +823,7 @@ html, body {
   .search-dock__list { max-height: min(220px, 52vh); }
 
   .panel--right {
-    top: 64px;
+    top: 78px;
     left: 6px;
     right: 6px;
     max-height: none;
