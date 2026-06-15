@@ -1552,9 +1552,15 @@ function resize() {
 }
 
 /* ===== Mobile layout ===== */
-const MQ_MOBILE = window.matchMedia("(max-width: 760px)");
+const MQ_MOBILE = window.matchMedia(
+  "(max-width: 760px), (orientation: landscape) and (max-height: 520px) and (max-width: 960px)"
+);
+const MQ_LANDSCAPE = window.matchMedia("(orientation: landscape)");
 function isMobileLayout() {
   return MQ_MOBILE.matches;
+}
+function isMobileLandscape() {
+  return isMobileLayout() && MQ_LANDSCAPE.matches;
 }
 function syncInfoPanelToggle() {
   const panel = el("infoPanel");
@@ -1563,7 +1569,7 @@ function syncInfoPanelToggle() {
   const open = !panel.classList.contains("panel--collapsed");
   btn.setAttribute("aria-expanded", open ? "true" : "false");
   btn.textContent = open ? "▾" : "▴";
-  el("screen").classList.toggle("info-collapsed", isMobileLayout() && !open);
+  el("screen").classList.toggle("info-collapsed", isMobileLayout() && !isMobileLandscape() && !open);
 }
 function openSysDrawer() {
   const drawer = el("sysDrawer");
@@ -1584,6 +1590,7 @@ function closeSysDrawer() {
 }
 function applyMobileLayout() {
   document.documentElement.classList.toggle("is-mobile", isMobileLayout());
+  document.documentElement.classList.toggle("is-mobile-landscape", isMobileLandscape());
   mountTogglesForLayout();
   if (isMobileLayout()) {
     closeSysDrawer();
@@ -1657,6 +1664,7 @@ document.addEventListener("keydown", (e) => {
   if (e.key === "Escape") closeSysDrawer();
 });
 MQ_MOBILE.addEventListener("change", applyMobileLayout);
+MQ_LANDSCAPE.addEventListener("change", applyMobileLayout);
 setupGlobeTouch();
 
 window.addEventListener("resize", resize);
